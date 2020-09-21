@@ -1,7 +1,6 @@
 import { Command } from 'discord-akairo';
 import { Message, GuildMember } from 'discord.js';
 import { Repository } from 'typeorm';
-
 import { Warn } from '../../models/Warn';
 
 export default class WarnCommand extends Command {
@@ -37,20 +36,17 @@ export default class WarnCommand extends Command {
   }
   async exec(message: Message, { member, reason }: { member: GuildMember; reason: string }) {
     const warnRepo: Repository<Warn> = this.client.db.getRepository(Warn);
-    if (
-      member.roles.highest.position >= message.member.roles.highest.position &&
-      message.author.id !== message.guild.ownerID
-    )
-      return await message.util.reply('this member as higher or equal role priority!');
+    if (member.roles.highest.position >= message.member.roles.highest.position && message.author.id !== message.guild.ownerID)
+      return message.util.reply("This member has a higher roles or equal roles to you!");
 
     await warnRepo.insert({
       guild: message.guild.id,
       user: member.id,
       moderator: message.author.id,
-      reason,
+      reason: reason
     });
-    return await message.util.send(
-      `:white_check_mark: **${member.user.tag}** has been successfully warned by **${message.author.tag}** for \`${reason}\`.`
-    );
+    return message.util.send(`**${member.user.tag}** has been warned by **${message.author.tag}** for **\`${reason}\`**`);
+
+
   }
 }
